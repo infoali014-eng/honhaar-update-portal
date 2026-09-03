@@ -10,13 +10,12 @@ import {
   Users,
 } from 'lucide-react';
 
-const STORAGE_KEY = 'honhaar_dahi_votes';
+const STORAGE_KEY = 'honhaar_voted_status';
 
-interface VoteState {
+interface VoteData {
   khatta: number;
   khatti: number;
-  hasVoted: boolean;
-  userChoice: string | null;
+  total: number;
 }
 
 export default function StatusForm() {
@@ -24,34 +23,45 @@ export default function StatusForm() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [votes, setVotes] = useState<VoteState>({
+  const [hasVotedLocally, setHasVotedLocally] = useState(false);
+  const [votes, setVotes] = useState<VoteData>({
     khatta: 0,
     khatti: 0,
-    hasVoted: false,
-    userChoice: null,
+    total: 0,
   });
 
-  // Load purely real votes from localStorage (no dummy data)
+  // Fetch real live vote counts from server API
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setVotes(parsed);
-        if (parsed.userChoice) {
-          setSelectedOption(parsed.userChoice);
-        }
+      const savedChoice = localStorage.getItem(STORAGE_KEY);
+      if (savedChoice) {
+        setHasVotedLocally(true);
+        setSelectedOption(savedChoice);
       }
     } catch {
       // ignore
     }
+
+    const loadRealVotes = async () => {
+      try {
+        const res = await fetch('/api/votes', { cache: 'no-store' });
+        if (res.ok) {
+          const data: VoteData = await res.json();
+          setVotes(data);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    loadRealVotes();
   }, []);
 
-  const totalVotes = votes.khatta + votes.khatti;
+  const totalVotes = votes.total;
   const khattaPercent = totalVotes > 0 ? Math.round((votes.khatta / totalVotes) * 100) : 0;
   const khattiPercent = totalVotes > 0 ? Math.round((votes.khatti / totalVotes) * 100) : 0;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -62,37 +72,28 @@ export default function StatusForm() {
 
     setIsSubmitting(true);
 
-    const choice = selectedOption as 'khatta' | 'khatti';
-    const isFirstTimeVote = !votes.hasVoted;
-    const isChangedVote = votes.hasVoted && votes.userChoice !== choice;
-
-    let updatedKhatta = votes.khatta;
-    let updatedKhatti = votes.khatti;
-
-    if (isFirstTimeVote) {
-      if (choice === 'khatta') updatedKhatta += 1;
-      if (choice === 'khatti') updatedKhatti += 1;
-    } else if (isChangedVote) {
-      if (choice === 'khatta') {
-        updatedKhatta += 1;
-        updatedKhatti = Math.max(0, updatedKhatti - 1);
-      } else {
-        updatedKhatti += 1;
-        updatedKhatta = Math.max(0, updatedKhatta - 1);
-      }
-    }
-
-    const updatedVotes: VoteState = {
-      khatta: updatedKhatta,
-      khatti: updatedKhatti,
-      hasVoted: true,
-      userChoice: selectedOption,
-    };
-
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedVotes));
+      // If user hasn't voted yet on this device, send real vote to API
+      if (!hasVotedLocally) {
+        const res = await fetch('/api/votes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ choice: selectedOption }),
+        });
+
+        if (res.ok) {
+          const updated: VoteData = await res.json();
+          setVotes(updated);
+        }
+
+        try {
+          localStorage.setItem(STORAGE_KEY, selectedOption);
+        } catch {
+          // ignore
+        }
+      }
     } catch {
-      // ignore
+      // Fallback
     }
 
     const chosenText = selectedOption === 'khatta' ? 'Dahi Khatta hota hai' : 'Dahi Khatti hoti hai';
@@ -134,7 +135,7 @@ export default function StatusForm() {
           <div className="flex items-center gap-1.5 bg-emerald-950/60 px-2.5 py-1 rounded-full text-[11px] text-emerald-200 border border-emerald-700/50">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
             <span className="font-mono font-semibold">
-              {totalVotes} {totalVotes === 1 ? 'vote' : 'votes'}
+              {totalVotes} {totalVotes === 1 ? 'real vote' : 'real votes'}
             </span>
           </div>
         )}
@@ -159,7 +160,7 @@ export default function StatusForm() {
               Dahi Khatta hota hai ya Dahi Khatti hoti hai? <span className="text-red-500">*</span>
             </label>
             <p className="text-xs text-slate-500">
-              Cast your vote to unlock and verify your scholarship status.
+              Cast your real vote to unlock and verify your scholarship status.
             </p>
 
             {/* Voting Options */}
@@ -180,7 +181,7 @@ export default function StatusForm() {
                         : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50'
                     }`}
                   >
-                    {/* Real percentage fill when votes exist */}
+                    {/* Real percentage fill based strictly on actual votes */}
                     {totalVotes > 0 && (
                       <div
                         className={`absolute left-0 top-0 bottom-0 pointer-events-none transition-all duration-500 ${
@@ -208,7 +209,7 @@ export default function StatusForm() {
                           </span>
                           {totalVotes > 0 && (
                             <span className="text-[11px] text-slate-500 font-mono">
-                              {opt.count} {opt.count === 1 ? 'vote' : 'votes'} ({opt.percent}%)
+                              {opt.count} {opt.count === 1 ? 'real vote' : 'real votes'} ({opt.percent}%)
                             </span>
                           )}
                         </div>
@@ -240,7 +241,7 @@ export default function StatusForm() {
               <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 px-1">
                 <span className="flex items-center gap-1">
                   <Users className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{totalVotes} {totalVotes === 1 ? 'vote cast' : 'total votes cast'}</span>
+                  <span>{totalVotes} {totalVotes === 1 ? 'total real vote' : 'total real votes'} across users</span>
                 </span>
               </div>
             )}
@@ -262,7 +263,7 @@ export default function StatusForm() {
               {isSubmitting ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Checking Status...</span>
+                  <span>Recording Real Vote &amp; Checking Status...</span>
                 </>
               ) : (
                 <>

@@ -19,15 +19,13 @@ interface PrankResultProps {
   answer: string;
 }
 
-const STORAGE_KEY = 'honhaar_dahi_votes';
-
 export default function PrankResult({ answer }: PrankResultProps) {
   const [clickCount, setClickCount] = useState(0);
   const [easterEggActive, setEasterEggActive] = useState(false);
   const [copied, setCopied] = useState(false);
   const [votesStats, setVotesStats] = useState<{ total: number; agreement: number } | null>(null);
 
-  // Pure click-based reactions (no prefilled dummy numbers)
+  // Pure click-based reactions (0 initial dummy numbers)
   const [reactions, setReactions] = useState<{ [key: string]: number }>({
     '😂': 0,
     '💀': 0,
@@ -37,19 +35,23 @@ export default function PrankResult({ answer }: PrankResultProps) {
   });
 
   useEffect(() => {
-    // Read real votes from localStorage
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        const total = (parsed.khatta || 0) + (parsed.khatti || 0);
-        const myCount = answer.includes('Khatta') ? parsed.khatta || 0 : parsed.khatti || 0;
-        const agreement = total > 0 ? Math.round((myCount / total) * 100) : 100;
-        setVotesStats({ total, agreement });
+    // Fetch real global live votes
+    const fetchRealStats = async () => {
+      try {
+        const res = await fetch('/api/votes', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          const total = data.total || 0;
+          const myCount = answer.includes('Khatta') ? data.khatta || 0 : data.khatti || 0;
+          const agreement = total > 0 ? Math.round((myCount / total) * 100) : 100;
+          setVotesStats({ total, agreement });
+        }
+      } catch {
+        // ignore
       }
-    } catch {
-      // ignore
-    }
+    };
+
+    fetchRealStats();
 
     try {
       const duration = 2.5 * 1000;
@@ -120,7 +122,7 @@ export default function PrankResult({ answer }: PrankResultProps) {
               <span className="text-white font-extrabold uppercase tracking-wide block text-xs">
                 Easter Egg Unlocked! 🕵️
               </span>
-              Relax! This is only a class prank. No real information was collected.
+              Relax! This is only a class prank. No real personal information was collected.
             </div>
           </div>
           <button
@@ -224,9 +226,9 @@ export default function PrankResult({ answer }: PrankResultProps) {
           </div>
           {votesStats && votesStats.total > 0 && (
             <div className="flex justify-between border-b border-amber-200/50 pb-1.5">
-              <span className="text-slate-500">Your Choice Share:</span>
+              <span className="text-slate-500">Real Class Agreement:</span>
               <span className="font-bold text-emerald-800">
-                {votesStats.agreement}% of votes cast
+                {votesStats.agreement}% of total {votesStats.total} real votes
               </span>
             </div>
           )}

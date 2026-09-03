@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import confetti from 'canvas-confetti';
 import {
   Award,
@@ -15,7 +16,6 @@ import {
   AlertOctagon,
   Download,
   FileText,
-  FileDown,
 } from 'lucide-react';
 import { generateEligibleStudentsPdf } from '@/lib/generatePdf';
 
@@ -45,7 +45,6 @@ export default function PrankResult({ answer, autoDownload }: PrankResultProps) 
   };
 
   useEffect(() => {
-    // If autoDownload was triggered, auto-start download after a short delay
     if (autoDownload && !hasDownloaded) {
       const timer = setTimeout(() => {
         generateEligibleStudentsPdf(answer);
@@ -56,7 +55,6 @@ export default function PrankResult({ answer, autoDownload }: PrankResultProps) 
   }, [autoDownload, answer, hasDownloaded]);
 
   useEffect(() => {
-    // Fetch real global live votes
     const fetchRealStats = async () => {
       try {
         const res = await fetch('/api/votes', { cache: 'no-store' });
@@ -167,7 +165,7 @@ export default function PrankResult({ answer, autoDownload }: PrankResultProps) 
                 eligiblestudents.pdf
               </span>
               <span className="bg-emerald-100 text-[#085e35] text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">
-                Unlocked &bull; Ready
+                Unlocked
               </span>
             </div>
             <p className="text-xs text-slate-600">
@@ -187,6 +185,31 @@ export default function PrankResult({ answer, autoDownload }: PrankResultProps) 
           <Download className="w-5 h-5 text-amber-300" />
           <span>{hasDownloaded ? 'Download Again (PDF)' : 'Download eligiblestudents.pdf'}</span>
         </button>
+      </div>
+
+      {/* 14 September Message + Salman Khan Meme Card */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-200 shadow-xl text-center space-y-4 overflow-hidden">
+        {/* The Simple Message */}
+        <div className="space-y-1">
+          <span className="text-xs font-bold text-amber-600 uppercase tracking-wider block">
+            Official University Inquiry Response:
+          </span>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug">
+            14 september ko university start ho rahi hai un sai hi poch lena 😂
+          </h2>
+        </div>
+
+        {/* The Salman Khan "Aapna kya lena dena" Meme Image */}
+        <div className="max-w-md mx-auto rounded-2xl overflow-hidden border-2 border-slate-800 shadow-2xl bg-black">
+          <Image
+            src="/aapna-kya-lena-dena.jpg"
+            alt="Aapna kya lena dena - Salman Khan Meme"
+            width={600}
+            height={300}
+            className="w-full h-auto object-cover"
+            priority
+          />
+        </div>
       </div>
 
       {/* Main Humorous Roman Urdu Banner */}
@@ -252,81 +275,6 @@ export default function PrankResult({ answer, autoDownload }: PrankResultProps) 
           <span className="text-[10px] text-slate-400 text-right">
             Verification status: Completely Exposed
           </span>
-        </div>
-      </div>
-
-      {/* Funny Certificate Card */}
-      <div className="bg-gradient-to-b from-[#fdfbf7] to-white rounded-3xl p-6 sm:p-9 border-4 border-double border-amber-600/50 shadow-xl relative overflow-hidden text-center space-y-4">
-        <div className="w-14 h-14 mx-auto rounded-full bg-amber-100 border-2 border-amber-400 flex items-center justify-center text-amber-700 shadow-inner">
-          <Award className="w-8 h-8" />
-        </div>
-
-        <div className="space-y-1">
-          <span className="text-[10px] uppercase tracking-widest font-extrabold text-amber-800">
-            Department of Backbenchers &bull; Section B
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900">
-            Certified Class Prank Victim
-          </h2>
-          <p className="text-xs text-slate-500 italic">
-            This certifies that the student answered with high confidence only to get pranked by their classmates.
-          </p>
-        </div>
-
-        {/* Certificate Metadata */}
-        <div className="max-w-md mx-auto my-5 p-4 rounded-xl bg-amber-50/70 border border-amber-200 text-left space-y-2 font-mono text-xs">
-          <div className="flex justify-between border-b border-amber-200/50 pb-1.5">
-            <span className="text-slate-500">Selected Answer:</span>
-            <span className="font-bold text-slate-900">&ldquo;{answer}&rdquo;</span>
-          </div>
-          {votesStats && votesStats.total > 0 && (
-            <div className="flex justify-between border-b border-amber-200/50 pb-1.5">
-              <span className="text-slate-500">Real Class Agreement:</span>
-              <span className="font-bold text-emerald-800">
-                {votesStats.agreement}% of total {votesStats.total} real votes
-              </span>
-            </div>
-          )}
-          <div className="flex justify-between border-b border-amber-200/50 pb-1.5">
-            <span className="text-slate-500">Date:</span>
-            <span className="font-bold text-slate-900">{todayDate}</span>
-          </div>
-          <div className="flex justify-between border-b border-amber-200/50 pb-1.5">
-            <span className="text-slate-500">Class Attendance:</span>
-            <span className="font-bold text-red-600">Pending Attendance Verification ☕</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">Verdict:</span>
-            <span className="font-bold text-[#085e35]">100% Certified Prank</span>
-          </div>
-        </div>
-
-        {/* Signatures */}
-        <div className="pt-3 flex flex-col sm:flex-row items-center justify-around gap-4 border-t border-slate-200 text-center">
-          <div className="space-y-1">
-            <div className="font-serif italic text-sm text-slate-700 border-b border-slate-300 pb-1 px-4">
-              Class CR &amp; Friends
-            </div>
-            <p className="text-[10px] text-slate-400 uppercase tracking-wider">
-              Chief Prankster
-            </p>
-          </div>
-
-          <div className="w-18 h-18 rounded-full border-2 border-dashed border-[#085e35] text-[#085e35] flex flex-col items-center justify-center p-1 transform rotate-[-6deg]">
-            <ShieldCheck className="w-4 h-4 text-amber-500" />
-            <span className="text-[8px] font-black uppercase text-center leading-tight">
-              Class Approved
-            </span>
-          </div>
-
-          <div className="space-y-1">
-            <div className="font-serif italic text-sm text-slate-700 border-b border-slate-300 pb-1 px-4">
-              Canteen Chai Committee
-            </div>
-            <p className="text-[10px] text-slate-400 uppercase tracking-wider">
-              Attendance Witness
-            </p>
-          </div>
         </div>
       </div>
 

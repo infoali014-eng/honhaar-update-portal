@@ -10,6 +10,7 @@ import PrankResult from '@/components/PrankResult';
 function ResultContent() {
   const searchParams = useSearchParams();
   const answer = searchParams.get('answer') || 'Dahi Khatta hota hai';
+  const autoDownload = searchParams.get('autoDownload') === 'true';
   const [isLoading, setIsLoading] = useState(true);
 
   return (
@@ -25,7 +26,7 @@ function ResultContent() {
           Status Inquiry
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-        <span className="text-slate-800 font-bold">Result</span>
+        <span className="text-slate-800 font-bold">eligiblestudents.pdf</span>
       </nav>
 
       {/* Dynamic View: Loading or Prank Reveal */}
@@ -35,7 +36,7 @@ function ResultContent() {
           onComplete={() => setIsLoading(false)}
         />
       ) : (
-        <PrankResult answer={answer} />
+        <PrankResult answer={answer} autoDownload={autoDownload} />
       )}
     </div>
   );

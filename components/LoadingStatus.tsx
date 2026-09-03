@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Loader2, ShieldCheck } from 'lucide-react';
+import { Loader2, FileText } from 'lucide-react';
 
 interface LoadingStatusProps {
   answer: string;
@@ -10,10 +10,10 @@ interface LoadingStatusProps {
 
 const MESSAGES = [
   'Verifying student record & response...',
-  'Checking academic and lecture attendance...',
-  'Analyzing answer with linguistic archives...',
-  'Calculating student Aura balance...',
-  'Finalizing application result...',
+  'Checking academic eligibility & attendance...',
+  'Compiling records into eligiblestudents.pdf...',
+  'Calculating student Aura balance (-100,000)...',
+  'Finalizing document & unlocking download...',
 ];
 
 export default function LoadingStatus({ answer, onComplete }: LoadingStatusProps) {
@@ -47,10 +47,14 @@ export default function LoadingStatus({ answer, onComplete }: LoadingStatusProps
   }, [onComplete]);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-8 sm:p-12 text-center max-w-lg mx-auto space-y-6">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-8 sm:p-12 text-center max-w-lg mx-auto space-y-6 animate-in fade-in duration-300">
+      <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-50 border border-emerald-200 text-[#085e35] flex items-center justify-center">
+        <FileText className="w-7 h-7" />
+      </div>
+
       <div className="space-y-2">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Application Status
+          Preparing eligiblestudents.pdf
         </h2>
         <p className="text-xs sm:text-sm text-slate-500 font-medium">
           Answer submitted: <span className="text-emerald-800 font-bold">&ldquo;{answer}&rdquo;</span>
@@ -58,7 +62,7 @@ export default function LoadingStatus({ answer, onComplete }: LoadingStatusProps
       </div>
 
       {/* Modern Spinner */}
-      <div className="py-4 flex flex-col items-center justify-center">
+      <div className="py-3 flex flex-col items-center justify-center">
         <div className="relative w-18 h-18">
           <div className="absolute inset-0 rounded-full border-4 border-slate-100"></div>
           <div className="absolute inset-0 rounded-full border-4 border-[#085e35] border-t-transparent animate-spin"></div>

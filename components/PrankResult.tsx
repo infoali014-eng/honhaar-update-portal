@@ -13,19 +13,24 @@ import {
   ShieldCheck,
   Flame,
   AlertOctagon,
+  Download,
+  FileText,
+  FileDown,
 } from 'lucide-react';
+import { generateEligibleStudentsPdf } from '@/lib/generatePdf';
 
 interface PrankResultProps {
   answer: string;
+  autoDownload?: boolean;
 }
 
-export default function PrankResult({ answer }: PrankResultProps) {
+export default function PrankResult({ answer, autoDownload }: PrankResultProps) {
   const [clickCount, setClickCount] = useState(0);
   const [easterEggActive, setEasterEggActive] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [hasDownloaded, setHasDownloaded] = useState(false);
   const [votesStats, setVotesStats] = useState<{ total: number; agreement: number } | null>(null);
 
-  // Pure click-based reactions (0 initial dummy numbers)
   const [reactions, setReactions] = useState<{ [key: string]: number }>({
     '😂': 0,
     '💀': 0,
@@ -33,6 +38,22 @@ export default function PrankResult({ answer }: PrankResultProps) {
     '☕': 0,
     '🔥': 0,
   });
+
+  const handleDownload = () => {
+    generateEligibleStudentsPdf(answer);
+    setHasDownloaded(true);
+  };
+
+  useEffect(() => {
+    // If autoDownload was triggered, auto-start download after a short delay
+    if (autoDownload && !hasDownloaded) {
+      const timer = setTimeout(() => {
+        generateEligibleStudentsPdf(answer);
+        setHasDownloaded(true);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [autoDownload, answer, hasDownloaded]);
 
   useEffect(() => {
     // Fetch real global live votes
@@ -133,6 +154,40 @@ export default function PrankResult({ answer }: PrankResultProps) {
           </button>
         </div>
       )}
+
+      {/* Prominent PDF Download Box */}
+      <div className="bg-white rounded-3xl border-2 border-emerald-700/40 p-5 sm:p-7 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-5 relative overflow-hidden">
+        <div className="flex items-center gap-4 text-left">
+          <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-200 text-red-600 flex items-center justify-center shrink-0 shadow-inner">
+            <FileText className="w-8 h-8" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="font-mono font-black text-slate-900 text-lg">
+                eligiblestudents.pdf
+              </span>
+              <span className="bg-emerald-100 text-[#085e35] text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">
+                Unlocked &bull; Ready
+              </span>
+            </div>
+            <p className="text-xs text-slate-600">
+              Official Merit Notification &bull; Verified Answer: &ldquo;{answer}&rdquo;
+            </p>
+            <p className="text-[11px] text-red-600 font-bold">
+              Status: Pranked &bull; Aura Penalty: -100,000 📉
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleDownload}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#085e35] hover:bg-[#054025] text-white font-bold text-sm px-6 py-4 rounded-xl shadow-lg shadow-emerald-900/20 hover:shadow-emerald-900/30 transition-all duration-150 active:scale-95 shrink-0"
+        >
+          <Download className="w-5 h-5 text-amber-300" />
+          <span>{hasDownloaded ? 'Download Again (PDF)' : 'Download eligiblestudents.pdf'}</span>
+        </button>
+      </div>
 
       {/* Main Humorous Roman Urdu Banner */}
       <div

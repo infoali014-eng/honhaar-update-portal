@@ -4,117 +4,28 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import confetti from 'canvas-confetti';
-import {
-  Award,
-  Sparkles,
-  RotateCcw,
-  Share2,
-  Check,
-  PartyPopper,
-  ShieldCheck,
-  Flame,
-  AlertOctagon,
-  Download,
-  FileText,
-} from 'lucide-react';
-import { generateEligibleStudentsPdf } from '@/lib/generatePdf';
+import { RotateCcw, Share2, Check } from 'lucide-react';
 
 interface PrankResultProps {
-  answer: string;
+  answer?: string;
   autoDownload?: boolean;
 }
 
-export default function PrankResult({ answer, autoDownload }: PrankResultProps) {
-  const [clickCount, setClickCount] = useState(0);
-  const [easterEggActive, setEasterEggActive] = useState(false);
+export default function PrankResult({}: PrankResultProps) {
   const [copied, setCopied] = useState(false);
-  const [hasDownloaded, setHasDownloaded] = useState(false);
-  const [votesStats, setVotesStats] = useState<{ total: number; agreement: number } | null>(null);
-
-  const [reactions, setReactions] = useState<{ [key: string]: number }>({
-    '😂': 0,
-    '💀': 0,
-    '😭': 0,
-    '☕': 0,
-    '🔥': 0,
-  });
-
-  const handleDownload = () => {
-    generateEligibleStudentsPdf(answer);
-    setHasDownloaded(true);
-  };
 
   useEffect(() => {
-    if (autoDownload && !hasDownloaded) {
-      const timer = setTimeout(() => {
-        generateEligibleStudentsPdf(answer);
-        setHasDownloaded(true);
-      }, 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [autoDownload, answer, hasDownloaded]);
-
-  useEffect(() => {
-    const fetchRealStats = async () => {
-      try {
-        const res = await fetch('/api/votes', { cache: 'no-store' });
-        if (res.ok) {
-          const data = await res.json();
-          const total = data.total || 0;
-          const myCount = answer.includes('Khatta') ? data.khatta || 0 : data.khatti || 0;
-          const agreement = total > 0 ? Math.round((myCount / total) * 100) : 100;
-          setVotesStats({ total, agreement });
-        }
-      } catch {
-        // ignore
-      }
-    };
-
-    fetchRealStats();
-
     try {
-      const duration = 2.5 * 1000;
-      const animationEnd = Date.now() + duration;
-
-      const interval: NodeJS.Timeout = setInterval(() => {
-        const timeLeft = animationEnd - Date.now();
-        if (timeLeft <= 0) {
-          return clearInterval(interval);
-        }
-
-        confetti({
-          startVelocity: 30,
-          spread: 360,
-          ticks: 60,
-          origin: {
-            x: Math.random(),
-            y: Math.random() * 0.4,
-          },
-          colors: ['#085e35', '#f59e0b', '#10b981', '#fbbf24', '#ef4444'],
-        });
-      }, 350);
-
-      return () => clearInterval(interval);
+      confetti({
+        particleCount: 70,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#085e35', '#f59e0b', '#10b981', '#fbbf24', '#ef4444'],
+      });
     } catch {
       // Fallback
     }
-  }, [answer]);
-
-  const handleMessageClick = () => {
-    const next = clickCount + 1;
-    setClickCount(next);
-    if (next >= 3) {
-      setEasterEggActive(true);
-      confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
-    }
-  };
-
-  const handleEmojiClick = (emoji: string) => {
-    setReactions((prev) => ({
-      ...prev,
-      [emoji]: (prev[emoji] || 0) + 1,
-    }));
-  };
+  }, []);
 
   const handleCopyLink = () => {
     if (typeof window !== 'undefined') {
@@ -124,197 +35,40 @@ export default function PrankResult({ answer, autoDownload }: PrankResultProps) 
     }
   };
 
-  const todayDate = new Date().toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-
   return (
-    <div className="max-w-3xl mx-auto space-y-7 animate-in zoom-in-95 duration-300">
-      {/* Easter Egg Modal/Alert */}
-      {easterEggActive && (
-        <div className="p-4 bg-emerald-950 text-amber-300 rounded-2xl border-2 border-amber-400 shadow-2xl flex items-center justify-between gap-3 animate-in slide-in-from-top duration-300">
-          <div className="flex items-center gap-3">
-            <Sparkles className="w-6 h-6 text-amber-400 shrink-0 animate-bounce" />
-            <div className="text-sm font-semibold">
-              <span className="text-white font-extrabold uppercase tracking-wide block text-xs">
-                Easter Egg Unlocked! 🕵️
-              </span>
-              Relax! This is only a class prank. No real personal information was collected.
-            </div>
-          </div>
-          <button
-            onClick={() => setEasterEggActive(false)}
-            className="text-xs bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-3 py-1.5 rounded-lg"
-          >
-            Got it
-          </button>
-        </div>
-      )}
+    <div className="max-w-2xl mx-auto py-6 space-y-6 text-center animate-in zoom-in-95 duration-300">
+      {/* 1. The Simple Message */}
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-snug px-4">
+        14 september ko university start ho rahi hai un sai hi poch lena 😂
+      </h1>
 
-      {/* Prominent PDF Download Box */}
-      <div className="bg-white rounded-3xl border-2 border-emerald-700/40 p-5 sm:p-7 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-5 relative overflow-hidden">
-        <div className="flex items-center gap-4 text-left">
-          <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-200 text-red-600 flex items-center justify-center shrink-0 shadow-inner">
-            <FileText className="w-8 h-8" />
-          </div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="font-mono font-black text-slate-900 text-lg">
-                eligiblestudents.pdf
-              </span>
-              <span className="bg-emerald-100 text-[#085e35] text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">
-                Unlocked
-              </span>
-            </div>
-            <p className="text-xs text-slate-600">
-              Official Merit Notification &bull; Verified Answer: &ldquo;{answer}&rdquo;
-            </p>
-            <p className="text-[11px] text-red-600 font-bold">
-              Status: Pranked &bull; Aura Penalty: -100,000 📉
-            </p>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleDownload}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#085e35] hover:bg-[#054025] text-white font-bold text-sm px-6 py-4 rounded-xl shadow-lg shadow-emerald-900/20 hover:shadow-emerald-900/30 transition-all duration-150 active:scale-95 shrink-0"
-        >
-          <Download className="w-5 h-5 text-amber-300" />
-          <span>{hasDownloaded ? 'Download Again (PDF)' : 'Download eligiblestudents.pdf'}</span>
-        </button>
+      {/* 2. Salman Khan Meme Image */}
+      <div className="max-w-lg mx-auto rounded-2xl overflow-hidden border-2 border-slate-900 shadow-2xl bg-black">
+        <Image
+          src="/aapna-kya-lena-dena.jpg"
+          alt="Aapna kya lena dena"
+          width={640}
+          height={320}
+          className="w-full h-auto object-cover"
+          priority
+        />
       </div>
 
-      {/* 14 September Message + Salman Khan Meme Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-200 shadow-xl text-center space-y-4 overflow-hidden">
-        {/* The Simple Message */}
-        <div className="space-y-1">
-          <span className="text-xs font-bold text-amber-600 uppercase tracking-wider block">
-            Official University Inquiry Response:
-          </span>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug">
-            14 september ko university start ho rahi hai un sai hi poch lena 😂
-          </h2>
-        </div>
-
-        {/* The Salman Khan "Aapna kya lena dena" Meme Image */}
-        <div className="max-w-md mx-auto rounded-2xl overflow-hidden border-2 border-slate-800 shadow-2xl bg-black">
-          <Image
-            src="/aapna-kya-lena-dena.jpg"
-            alt="Aapna kya lena dena - Salman Khan Meme"
-            width={600}
-            height={300}
-            className="w-full h-auto object-cover"
-            priority
-          />
-        </div>
-      </div>
-
-      {/* Main Humorous Roman Urdu Banner */}
-      <div
-        onClick={handleMessageClick}
-        title="Click me for a surprise!"
-        className="bg-gradient-to-r from-emerald-800 via-[#085e35] to-emerald-900 rounded-3xl p-7 sm:p-10 text-white text-center shadow-2xl relative overflow-hidden cursor-pointer select-none border-4 border-amber-400/80 transition-transform active:scale-[0.99]"
-      >
-        <div className="absolute top-4 right-4 bg-amber-400 text-slate-950 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
-          <PartyPopper className="w-3.5 h-3.5" />
-          <span>Status: Busted</span>
-        </div>
-
-        <div className="space-y-4 pt-1">
-          <div className="inline-block text-5xl animate-bounce">😂</div>
-
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-amber-300 tracking-tight leading-snug drop-shadow-md">
-            &ldquo;Janab, application check karne se pehle thori attendance bhi check kar liya karein 😂&rdquo;
-          </h1>
-
-          <p className="text-base sm:text-xl font-medium text-emerald-100 max-w-xl mx-auto">
-            Congratulations! Aap officially <span className="text-amber-300 font-bold underline decoration-wavy">class prank</span> ka shikar ho chukay hain.
-          </p>
-
-          <p className="text-xs text-emerald-200/70 pt-1">
-            (💡 Tip: Click this banner 3 times for a secret easter egg &bull; {clickCount}/3 clicks)
-          </p>
-        </div>
-      </div>
-
-      {/* Aura Points Penalty & Fake Progress Meter */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Aura Penalty Card */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-500/15 text-amber-600 flex items-center justify-center shrink-0">
-            <Flame className="w-6 h-6" />
-          </div>
-          <div>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-              Aura Calculation
-            </span>
-            <span className="text-xl font-black text-red-600 font-mono">
-              -100,000 AURA 📉💀
-            </span>
-            <p className="text-[11px] text-slate-500">
-              Dahi chahe khatta ho ya khatti, aap ka prank confirm ho chuka hai!
-            </p>
-          </div>
-        </div>
-
-        {/* 100% Pranked Bar */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-center space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold">
-            <span className="text-slate-700 flex items-center gap-1.5">
-              <AlertOctagon className="w-3.5 h-3.5 text-amber-500" />
-              Prank Severity
-            </span>
-            <span className="text-emerald-700 font-mono">100% Pranked</span>
-          </div>
-          <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden p-0.5 border border-slate-200">
-            <div className="bg-gradient-to-r from-amber-400 via-emerald-600 to-green-600 h-full rounded-full w-full animate-pulse"></div>
-          </div>
-          <span className="text-[10px] text-slate-400 text-right">
-            Verification status: Completely Exposed
-          </span>
-        </div>
-      </div>
-
-      {/* Emoji Reactions */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm text-center space-y-2">
-        <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-          Class Reactions:
-        </h3>
-        <div className="flex flex-wrap items-center justify-center gap-2.5">
-          {Object.entries(reactions).map(([emoji, count]) => (
-            <button
-              key={emoji}
-              type="button"
-              onClick={() => handleEmojiClick(emoji)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-emerald-50 text-slate-800 rounded-lg border border-slate-200 text-sm font-semibold transition-transform active:scale-95"
-            >
-              <span className="text-lg">{emoji}</span>
-              {count > 0 && (
-                <span className="font-mono text-xs text-slate-600">{count}</span>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-1 pb-8">
+      {/* 3. Minimal Clean Buttons */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 px-4">
         <button
           type="button"
           onClick={handleCopyLink}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-7 py-3.5 rounded-xl shadow-md transition-all active:scale-95"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#085e35] hover:bg-[#054025] text-white font-bold px-6 py-3 rounded-xl shadow-md transition-all active:scale-95 text-sm"
         >
           {copied ? (
             <>
-              <Check className="w-5 h-5" />
-              <span>Link Copied! Send to Friends</span>
+              <Check className="w-4 h-4" />
+              <span>Link Copied!</span>
             </>
           ) : (
             <>
-              <Share2 className="w-5 h-5" />
+              <Share2 className="w-4 h-4 text-amber-300" />
               <span>Prank a Classmate (Copy Link)</span>
             </>
           )}
@@ -322,7 +76,7 @@ export default function PrankResult({ answer, autoDownload }: PrankResultProps) 
 
         <Link
           href="/"
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-6 py-3.5 rounded-xl border border-slate-300 transition-colors active:scale-95"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-6 py-3 rounded-xl border border-slate-300 transition-colors active:scale-95 text-sm"
         >
           <RotateCcw className="w-4 h-4 text-slate-600" />
           <span>Try Again</span>

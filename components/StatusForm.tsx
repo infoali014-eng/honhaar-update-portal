@@ -305,15 +305,24 @@ export default function StatusForm() {
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
-            {/* Warning: Aura penalty text */}
-            <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 text-amber-950 text-xs sm:text-sm font-medium flex items-start gap-3">
-              <Flame className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <div className="space-y-0.5">
-                <strong className="text-amber-900 font-bold block">Important Advisory:</strong>
-                <p className="leading-relaxed">
-                  We have not created poll k agar answer na kia tou aura minus ho jaye ga! 📉💀
-                </p>
+            {/* Security Captcha Verification Box */}
+            <div className="p-4 bg-slate-50/90 rounded-xl border border-slate-300/80 text-slate-800 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-100 border border-emerald-300 text-[#0a5836] flex items-center justify-center shrink-0">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 text-sm">
+                    Verify you are not a robot
+                  </h4>
+                  <p className="text-xs text-slate-500">
+                    Verify Captcha: Select your answer below to confirm human verification.
+                  </p>
+                </div>
               </div>
+              <span className="bg-white text-slate-700 font-mono font-bold text-[10px] px-2.5 py-1 rounded border border-slate-300 uppercase tracking-wider shrink-0 shadow-2xs">
+                Captcha
+              </span>
             </div>
 
             {/* The Question Form */}

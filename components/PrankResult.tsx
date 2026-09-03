@@ -39,7 +39,7 @@ export default function PrankResult({}: PrankResultProps) {
     <div className="max-w-2xl mx-auto py-6 space-y-6 text-center animate-in zoom-in-95 duration-300">
       {/* 1. The Simple Message */}
       <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-snug px-4">
-        14 september ko university start ho rahi hai un sai hi poch lena 😂
+        14 september ko university start ho rahi hai un sai hi poch lena 😏
       </h1>
 
       {/* 2. Salman Khan Meme Image */}

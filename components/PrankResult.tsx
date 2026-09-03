@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import confetti from 'canvas-confetti';
-import { RotateCcw, Share2, Check } from 'lucide-react';
+import { RotateCcw, Share2, Check, MessageCircle } from 'lucide-react';
 
 interface PrankResultProps {
   answer?: string;
@@ -27,11 +27,23 @@ export default function PrankResult({}: PrankResultProps) {
     }
   }, []);
 
+  const getShareText = () => {
+    const url = typeof window !== 'undefined' ? window.location.origin + '/status' : '';
+    return `📢 *Honhaar Scholarship 2026 - Eligibility & Merit List Released!*\n\nCheck your status and download eligiblestudents.pdf here:\n👉 ${url}`;
+  };
+
   const handleCopyLink = () => {
     if (typeof window !== 'undefined') {
-      navigator.clipboard.writeText(window.location.origin + '/status');
+      navigator.clipboard.writeText(getShareText());
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
+    }
+  };
+
+  const handleWhatsAppShare = () => {
+    if (typeof window !== 'undefined') {
+      const text = encodeURIComponent(getShareText());
+      window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
     }
   };
 
@@ -58,25 +70,34 @@ export default function PrankResult({}: PrankResultProps) {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 px-4">
         <button
           type="button"
+          onClick={handleWhatsAppShare}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold px-6 py-3 rounded-xl shadow-md transition-all active:scale-95 text-sm"
+        >
+          <MessageCircle className="w-4 h-4 fill-white" />
+          <span>Send on WhatsApp</span>
+        </button>
+
+        <button
+          type="button"
           onClick={handleCopyLink}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#085e35] hover:bg-[#054025] text-white font-bold px-6 py-3 rounded-xl shadow-md transition-all active:scale-95 text-sm"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0a5836] hover:bg-[#074228] text-white font-bold px-6 py-3 rounded-xl shadow-md transition-all active:scale-95 text-sm"
         >
           {copied ? (
             <>
               <Check className="w-4 h-4" />
-              <span>Link Copied!</span>
+              <span>Message &amp; Link Copied!</span>
             </>
           ) : (
             <>
               <Share2 className="w-4 h-4 text-amber-300" />
-              <span>Prank a Classmate (Copy Link)</span>
+              <span>Copy WhatsApp Text</span>
             </>
           )}
         </button>
 
         <Link
           href="/"
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-6 py-3 rounded-xl border border-slate-300 transition-colors active:scale-95 text-sm"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-5 py-3 rounded-xl border border-slate-300 transition-colors active:scale-95 text-sm"
         >
           <RotateCcw className="w-4 h-4 text-slate-600" />
           <span>Try Again</span>

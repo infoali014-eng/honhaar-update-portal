@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
   FileCheck2,
   ArrowRight,
@@ -11,8 +12,6 @@ import {
   FileText,
   Download,
   Lock,
-  CheckCircle2,
-  Sparkles,
 } from 'lucide-react';
 
 const STORAGE_KEY = 'honhaar_voted_status';
@@ -30,7 +29,6 @@ export default function StatusForm() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasVotedLocally, setHasVotedLocally] = useState(false);
-  const [showQuestion, setShowQuestion] = useState(false);
   const [votes, setVotes] = useState<VoteData>({
     khatta: 0,
     khatti: 0,
@@ -69,10 +67,7 @@ export default function StatusForm() {
   const khattiPercent = totalVotes > 0 ? Math.round((votes.khatti / totalVotes) * 100) : 0;
 
   const handleDownloadClick = () => {
-    setShowQuestion(true);
-    setTimeout(() => {
-      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -117,14 +112,18 @@ export default function StatusForm() {
     {
       id: 'khatta',
       label: 'Dahi Khatta hota hai',
+      subtitle: 'Bro is fighting for his life with that sour dahi 🍋',
       badge: 'Option A',
+      image: '/man-khatta.jpg',
       count: votes.khatta,
       percent: khattaPercent,
     },
     {
       id: 'khatti',
       label: 'Dahi Khatti hoti hai',
+      subtitle: 'She is ready to start a 3rd World War for khatti dahi 📢',
       badge: 'Option B',
+      image: '/woman-khatti.jpg',
       count: votes.khatti,
       percent: khattiPercent,
     },
@@ -153,7 +152,7 @@ export default function StatusForm() {
               </p>
               <p className="text-[11px] text-amber-700 font-semibold flex items-center gap-1">
                 <Lock className="w-3 h-3 text-amber-600" />
-                <span>Student verification question required to download</span>
+                <span>Answer the Dahi question below to download</span>
               </p>
             </div>
           </div>
@@ -169,7 +168,7 @@ export default function StatusForm() {
         </div>
       </div>
 
-      {/* 2. Verification Step Form (Requested question UI) */}
+      {/* 2. Verification Step Form with Funny Photos */}
       <div
         ref={formRef}
         className="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden animate-in fade-in duration-300"
@@ -218,8 +217,8 @@ export default function StatusForm() {
                 Cast your real vote to unlock and download <span className="font-mono font-bold text-slate-800">eligiblestudents.pdf</span>.
               </p>
 
-              {/* Voting Options */}
-              <div className="space-y-3.5 pt-2">
+              {/* Voting Options with Funny Images */}
+              <div className="space-y-4 pt-2">
                 {options.map((opt) => {
                   const isSelected = selectedOption === opt.id;
                   return (
@@ -230,23 +229,25 @@ export default function StatusForm() {
                         setSelectedOption(opt.id);
                         if (error) setError(null);
                       }}
-                      className={`w-full text-left p-4 rounded-xl border-2 transition-all relative overflow-hidden group ${
+                      className={`w-full text-left p-3.5 sm:p-4 rounded-2xl border-2 transition-all relative overflow-hidden group ${
                         isSelected
-                          ? 'border-[#085e35] bg-emerald-50/70 shadow-sm ring-1 ring-[#085e35]'
+                          ? 'border-[#085e35] bg-emerald-50/70 shadow-md ring-2 ring-[#085e35]/30'
                           : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50'
                       }`}
                     >
+                      {/* Real percentage background fill */}
                       {totalVotes > 0 && (
                         <div
                           className={`absolute left-0 top-0 bottom-0 pointer-events-none transition-all duration-500 ${
-                            isSelected ? 'bg-emerald-100/60' : 'bg-slate-100/60'
+                            isSelected ? 'bg-emerald-100/70' : 'bg-slate-100/60'
                           }`}
                           style={{ width: `${opt.percent}%` }}
                         />
                       )}
 
-                      <div className="relative z-10 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-3">
+                      <div className="relative z-10 flex items-center justify-between gap-3 sm:gap-4">
+                        <div className="flex items-center gap-3 sm:gap-4 flex-1">
+                          {/* Radio Indicator */}
                           <div
                             className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
                               isSelected
@@ -257,19 +258,36 @@ export default function StatusForm() {
                             {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
                           </div>
 
-                          <div>
-                            <span className="font-bold text-slate-800 text-sm sm:text-base block">
+                          {/* Funny Meme Photo Thumbnail */}
+                          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 border-white shadow-md shrink-0 bg-slate-100">
+                            <Image
+                              src={opt.image}
+                              alt={opt.label}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-200"
+                              sizes="(max-width: 640px) 64px, 80px"
+                              priority
+                            />
+                          </div>
+
+                          {/* Label & Subtitle */}
+                          <div className="space-y-0.5 flex-1 min-w-0">
+                            <span className="font-extrabold text-slate-900 text-sm sm:text-base block truncate">
                               {opt.label}
                             </span>
+                            <span className="text-[11px] text-slate-500 line-clamp-1">
+                              {opt.subtitle}
+                            </span>
                             {totalVotes > 0 && (
-                              <span className="text-[11px] text-slate-500 font-mono">
+                              <span className="text-[11px] text-emerald-800 font-mono font-bold block pt-0.5">
                                 {opt.count} {opt.count === 1 ? 'real vote' : 'real votes'} ({opt.percent}%)
                               </span>
                             )}
                           </div>
                         </div>
 
-                        <div className="flex flex-col items-end">
+                        {/* Badges */}
+                        <div className="flex flex-col items-end shrink-0 pl-1">
                           <span
                             className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
                               isSelected
@@ -280,7 +298,7 @@ export default function StatusForm() {
                             {opt.badge}
                           </span>
                           {totalVotes > 0 && (
-                            <span className="text-xs font-black font-mono text-slate-600 mt-1">
+                            <span className="text-xs font-black font-mono text-slate-700 mt-1">
                               {opt.percent}%
                             </span>
                           )}
@@ -317,7 +335,7 @@ export default function StatusForm() {
                 {isSubmitting ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Verifying &amp; Unlocking PDF...</span>
+                    <span>Recording Vote &amp; Unlocking PDF...</span>
                   </>
                 ) : (
                   <>

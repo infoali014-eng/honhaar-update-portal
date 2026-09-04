@@ -4,8 +4,20 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Honhaar Update Portal | Class Demonstration',
-  description: 'A fictional scholarship portal created for a class demonstration and prank. No real information is collected.',
+  title: 'Honhaar Scholarships | Undergraduate Scholarship Program',
+  description: 'Higher Education Undergraduate Scholarship Program. Check your application status, eligibility guidelines, and download eligible students list.',
+  openGraph: {
+    title: 'Honhaar Scholarships | Undergraduate Scholarship Program',
+    description: 'Higher Education Undergraduate Scholarship Program. Check your application status, eligibility guidelines, and download eligible students list.',
+    url: 'https://honhaar-update-portal.vercel.app',
+    siteName: 'Honhaar Scholarships',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Honhaar Scholarships | Undergraduate Scholarship Program',
+    description: 'Higher Education Undergraduate Scholarship Program. Check your application status, eligibility guidelines, and download eligible students list.',
+  },
   icons: {
     icon: '/favicon.ico',
   },

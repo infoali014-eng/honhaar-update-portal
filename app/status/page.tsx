@@ -4,8 +4,20 @@ import { ChevronRight, Home } from 'lucide-react';
 import StatusForm from '@/components/StatusForm';
 
 export const metadata = {
-  title: 'Check Application Status | Honhaar Portal',
-  description: 'Verify your scholarship application status.',
+  title: 'Check Application Status | Honhaar Scholarships',
+  description: 'Verify your scholarship application status and download eligiblestudents.pdf.',
+  openGraph: {
+    title: 'Check Application Status | Honhaar Scholarships',
+    description: 'Verify your scholarship application status and download eligiblestudents.pdf.',
+    url: 'https://honhaar-update-portal.vercel.app/status',
+    siteName: 'Honhaar Scholarships',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Check Application Status | Honhaar Scholarships',
+    description: 'Verify your scholarship application status and download eligiblestudents.pdf.',
+  },
 };
 
 export default function StatusPage() {
